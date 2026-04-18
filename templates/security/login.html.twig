@@ -1,0 +1,137 @@
+{% extends 'app-base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+<div class="auth-shell">
+    {# ── Panneau branding ── #}
+    <div class="auth-brand">
+        <div class="auth-brand__content">
+            <div class="auth-brand__logo">
+                <svg viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2"/>
+                </svg>
+            </div>
+            <h1 class="auth-brand__title">PontBascule</h1>
+            <p class="auth-brand__desc">
+                Supervisez toutes vos opérations de pesée en temps réel, depuis n'importe où dans le pays.
+            </p>
+            <div class="auth-brand__features">
+                <div class="auth-brand__feature">
+                    <svg viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Synchronisation automatique des pesées
+                </div>
+                <div class="auth-brand__feature">
+                    <svg viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Statistiques et exports en temps réel
+                </div>
+                <div class="auth-brand__feature">
+                    <svg viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Données isolées par entreprise
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ── Panneau formulaire ── #}
+    <div class="auth-form-panel">
+        <div class="auth-form-box">
+
+            <div class="auth-form-box__header">
+                <h2 class="auth-form-box__title">Connexion</h2>
+                <p class="auth-form-box__subtitle">
+                    Entrez vos identifiants pour accéder à votre espace
+                </p>
+            </div>
+
+            {# Message succès après inscription #}
+            {% if success is defined and success %}
+                <div class="auth-alert auth-alert--success">
+                    <svg viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    {{ success }}
+                </div>
+            {% endif %}
+
+            {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+            {% if app.user %}
+                <div class="mb-3">
+                    You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Logout</a>
+                </div>
+            {% endif %}
+
+            <form method="POST" class="auth-form">
+                <div class="auth-section">
+                    <div class="auth-field">
+                        <label class="auth-field__label" for="email">Adresse email</label>
+                        <input class="auth-field__input"
+                               type="email"
+                               id="email"
+                               name="email"
+                               value="{{ last_username }}"
+                               autofocus
+                               placeholder="admin@entreprise.com"
+                               autocomplete="email"
+                               required>
+                    </div>
+
+                    <div class="auth-field">
+                        <label class="auth-field__label" for="password">Mot de passe</label>
+                        <div class="auth-field__input-wrap">
+                            <input class="auth-field__input"
+                                   type="password"
+                                   id="password"
+                                   name="password"
+                                   placeholder="••••••••"
+                                   autocomplete="current-password"
+                                   required>
+                            <button type="button" class="auth-field__eye" id="toggle-password" aria-label="Afficher le mot de passe">
+                                <svg id="eye-show" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                                <svg id="eye-hide" viewBox="0 0 24 24" stroke-width="2" style="display:none">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+                <div class="checkbox mb-3">
+                    <label>
+                        <input type="checkbox" name="_remember_me"> Se souvenir de moi
+                    </label>
+                </div>
+
+                <button type="submit" class="auth-btn">Se connecter</button>
+
+            </form>
+
+            <div class="auth-sep">ou</div>
+
+            <p class="auth-form-box__footer">
+                Pas encore de compte ?
+                <a href="{{ path('register.user') }}" class="auth-link">Rejoindre une entreprise</a>
+            </p>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

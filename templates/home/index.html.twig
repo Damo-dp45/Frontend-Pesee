@@ -1,0 +1,215 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block body %}
+<div class="dashboard">
+    {# ── Toolbar ── #}
+    <div class="dashboard-toolbar">
+        <div class="dashboard-toolbar__left">
+            <h2 class="dashboard-toolbar__title">Tableau de bord</h2>
+            <p class="dashboard-toolbar__sub">
+                {{ dateDebut|date('d/m/Y') }} — {{ dateFin|date('d/m/Y') }}
+            </p>
+        </div>
+        <form method="GET" class="dashboard-toolbar__right">
+            <div class="field-group">
+                <label class="field-group__label">Du</label>
+                <input class="field-group__input" type="date" name="date_debut" value="{{ dateDebut }}">
+            </div>
+            <div class="field-group">
+                <label class="field-group__label">Au</label>
+                <input class="field-group__input" type="date" name="date_fin" value="{{ dateFin }}">
+            </div>
+            <button type="submit" class="btn btn--primary" style="align-self:flex-end">
+                Filtrer
+            </button>
+        </form>
+    </div>
+
+    {# ── KPI Cards ── #}
+    <div class="kpi-grid">
+
+        <div class="kpi-card">
+            <div class="kpi-card__header">
+                <span class="kpi-card__label">Poids Net Total</span>
+                <span class="kpi-card__icon kpi-card__icon--1">
+                    <svg viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9"/>
+                    </svg>
+                </span>
+            </div>
+            <p class="kpi-card__value">
+                {{ ((stats.totaux.poidsnet ?? 0) / 1000)|number_format(1, ',', ' ') }} T
+            </p>
+            <p class="kpi-card__desc">Tonnage net cumulé</p>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-card__header">
+                <span class="kpi-card__label">Poids Brut Total</span>
+                <span class="kpi-card__icon kpi-card__icon--2">
+                    <svg viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
+                    </svg>
+                </span>
+            </div>
+            <p class="kpi-card__value">
+                {{ ((stats.totaux.poidsbrut ?? 0) / 1000)|number_format(1, ',', ' ') }} T
+            </p>
+            <p class="kpi-card__desc">Tonnage brut cumulé</p>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-card__header">
+                <span class="kpi-card__label">Opérations</span>
+                <span class="kpi-card__icon kpi-card__icon--3">
+                    <svg viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                </span>
+            </div>
+            <p class="kpi-card__value">{{ stats.totaux.nombre_operations ?? 0 }}</p>
+            <p class="kpi-card__desc">Pesées enregistrées</p>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-card__header">
+                <span class="kpi-card__label">Sites Actifs</span>
+                <span class="kpi-card__icon kpi-card__icon--4">
+                    <svg viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </span>
+            </div>
+            <p class="kpi-card__value">{{ sites|length }}</p>
+            <p class="kpi-card__desc">Ponts bascule reliés</p>
+        </div>
+
+    </div>
+
+    {# ── Graphique + Top sites ── #}
+    <div class="dashboard-grid">
+
+        {# Graphique barres #}
+        <div class="card card--wide">
+            <div class="card__header">
+                <div class="card__header-left">
+                    <p class="card__title">Tonnage net par jour</p>
+                    <p class="card__sub">En tonnes métriques</p>
+                </div>
+            </div>
+            <div class="card__body">
+                <div class="chart-wrapper" id="chart-tonnage"
+                     data-stats="{{ stats.par_jour|json_encode }}">
+                </div>
+            </div>
+        </div>
+
+        {# Top sites #}
+        <div class="card">
+            <div class="card__header">
+                <p class="card__title">Top sites</p>
+            </div>
+            <div class="card__body">
+                {% set parSite = stats.par_site ?? [] %}
+
+                {# Agréger par site (dédoublonner) #}
+                {% set topSites = [] %}
+                {% for row in parSite %}
+                    {% set exists = false %}
+                    {% for s in topSites %}
+                        {% if s.codesite == row.codesite %}{% set exists = true %}{% endif %}
+                    {% endfor %}
+                    {% if not exists %}
+                        {% set topSites = topSites|merge([{
+                            codesite:    row.codesite,
+                            libellesite: row.libellesite,
+                            total:       row.total_poidsnet
+                        }]) %}
+                    {% endif %}
+                {% endfor %}
+
+                {% if topSites is empty %}
+                    <p class="site-bars__empty">Aucune donnée sur la période</p>
+                {% else %}
+                    {% set maxVal = max(topSites|map(s => s.total)) %}
+                    <div class="site-bars">
+                        {% for site in topSites|slice(0, 6) %}
+                            <div class="site-bar">
+                                <div class="site-bar__meta">
+                                    <span class="site-bar__name" title="{{ site.libellesite }}">
+                                        {{ site.libellesite }}
+                                    </span>
+                                    <span class="site-bar__value">
+                                        {{ (site.total / 1000)|number_format(1, ',', ' ') }} T
+                                    </span>
+                                </div>
+                                <div class="site-bar__track">
+                                    <div class="site-bar__fill" style="width: {{ maxVal > 0 ? (site.total / maxVal * 100)|round : 0 }}%">
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    {# ── Dernières opérations ── #}
+    <div class="card">
+        <div class="card__header">
+            <p class="card__title">Dernières opérations</p>
+            <a href="{{ path('statistique') }}" class="card__link">Voir tout →</a>
+        </div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Site</th>
+                        <th>Produit</th>
+                        <th>Client</th>
+                        <th>Transporteur</th>
+                        <th class="col-right">Poids net (kg)</th>
+                        <th>Mouvement</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set dernieres = stats.dernieres ?? [] %}
+                    {% if dernieres is empty %}
+                        <tr>
+                            <td class="col-empty" colspan="7">
+                                Aucune opération sur la période sélectionnée
+                            </td>
+                        </tr>
+                    {% else %}
+                        {% for op in dernieres %}
+                            <tr>
+                                <td>
+                                    <span class="cell-primary">{{ op.libellesite }}</span>
+                                    <span class="cell-sub">{{ op.code }}</span>
+                                </td>
+                                <td class="col-muted">{{ op.produit ?: '—' }}</td>
+                                <td class="col-muted">{{ op.client ?: '—' }}</td>
+                                <td class="col-muted">{{ op.transporteur ?: '—' }}</td>
+                                <td class="col-right">
+                                    {{ op.poidsnet|number_format(0, ',', ' ') }}
+                                </td>
+                                <td>
+                                    <span class="badge">{{ op.mouvement ?: '—' }}</span>
+                                </td>
+                                <td class="col-muted">{{ op.date2 ?: '—' }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

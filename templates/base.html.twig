@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+        {% endblock %}
+
+        {% set frankenphpHotReload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
+        {% if frankenphpHotReload %}
+        <meta name="frankenphp-hot-reload:url" content="{{ frankenphpHotReload }}">
+        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
+        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
+        {% endif %}
+    </head>
+    <body>
+        <div class="app-shell">
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar__header">
+                    <button class="sidebar__brand" type="button" aria-label="PontBascule">
+                        <span class="sidebar__brand-icon">
+                            <svg viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2"/>
+                            </svg>
+                        </span>
+                        <span class="sidebar__brand-text">
+                            <span class="sidebar__brand-name">Pont bascule</span>
+                            <span class="sidebar__brand-plan">Enterprise</span>
+                        </span>
+                    </button>
+                </div>
+
+                {# Nav #}
+                <nav class="sidebar__nav">
+
+                    <div class="sidebar__section">
+                        <span class="sidebar__section-label">Plateforme</span>
+
+                        <a href="{{ path('home') }}"
+                        class="sidebar__item {% if app.request.attributes.get('_route') == 'home' %}sidebar__item--active{% endif %}">
+                            <svg class="sidebar__item-icon" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                            <span class="sidebar__item-label">Tableau de bord</span>
+                        </a>
+
+                        <a href="{{ path('statistique') }}"
+                        class="sidebar__item {% if app.request.attributes.get('_route') == 'statistique' %}sidebar__item--active{% endif %}">
+                            <svg class="sidebar__item-icon" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                            <span class="sidebar__item-label">Statistiques</span>
+                        </a>
+                    </div>
+                    {#
+                    <div class="sidebar__section">
+                        <span class="sidebar__section-label">Gestion</span>
+                        <div>
+                            <button class="sidebar__accordion-trigger" type="button" aria-expanded="false" data-accordion="operations">
+                                <svg class="sidebar__accordion-trigger-icon" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                                <span class="sidebar__accordion-label">Opérations</span>
+                                <svg class="sidebar__accordion-chevron" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                            <div class="sidebar__accordion-content" id="accordion-operations">
+                                <a href="#" class="sidebar__sub-item">
+                                    <span class="sidebar__sub-dot"></span>
+                                    Liste des pesées
+                                </a>
+                                <a href="#" class="sidebar__sub-item">
+                                    <span class="sidebar__sub-dot"></span>
+                                    Synchronisation
+                                </a>
+                                <a href="#" class="sidebar__sub-item">
+                                    <span class="sidebar__sub-dot"></span>
+                                    Exports
+                                </a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button class="sidebar__accordion-trigger" type="button" aria-expanded="false" data-accordion="sites">
+                                <svg class="sidebar__accordion-trigger-icon" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <span class="sidebar__accordion-label">Sites</span>
+                                <svg class="sidebar__accordion-chevron" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                            <div class="sidebar__accordion-content" id="accordion-sites">
+                                <a href="#" class="sidebar__sub-item">
+                                    <span class="sidebar__sub-dot"></span>
+                                    Tous les sites
+                                </a>
+                                <a href="#" class="sidebar__sub-item">
+                                    <span class="sidebar__sub-dot"></span>
+                                    Ajouter un site
+                                </a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button class="sidebar__accordion-trigger" type="button" aria-expanded="false" data-accordion="admin">
+                                <svg class="sidebar__accordion-trigger-icon" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <span class="sidebar__accordion-label">Administration</span>
+                                <svg class="sidebar__accordion-chevron" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                            <div class="sidebar__accordion-content" id="accordion-admin">
+                                <a href="#" class="sidebar__sub-item">
+                                    <span class="sidebar__sub-dot"></span>
+                                    Utilisateurs
+                                </a>
+                                <a href="#" class="sidebar__sub-item">
+                                    <span class="sidebar__sub-dot"></span>
+                                    Entreprise
+                                </a>
+                                <a href="#" class="sidebar__sub-item">
+                                    <span class="sidebar__sub-dot"></span>
+                                    Paramètres
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    #}
+                </nav>
+                <div class="sidebar__footer">
+                    <div class="sidebar__user-dropdown">
+
+                        {# Bouton utilisateur #}
+                        <button class="sidebar__user"
+                                type="button"
+                                id="sidebar-user-toggle"
+                                aria-haspopup="true"
+                                aria-expanded="false">
+                            <span class="sidebar__avatar">{{ app.user.nom|slice(0,1)|upper }}{{ app.user.prenom|slice(0,1)|upper }}</span>
+                            <span class="sidebar__user-info">
+                                <span class="sidebar__user-name">{{ app.user.nom }} {{ app.user.prenom }}</span>
+                                <span class="sidebar__user-email">{{ app.user.email }}</span>
+                            </span>
+                            <svg class="sidebar__user-chevron" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
+                            </svg>
+                        </button>
+
+                        {# Menu dropdown #}
+                        <div class="sidebar__user-menu" id="sidebar-user-menu" role="menu">
+                            <div class="sidebar__user-menu-header">
+                                <span class="sidebar__user-menu-name">
+                                    {{ app.user.nom }} {{ app.user.prenom }}
+                                </span>
+                                <span class="sidebar__user-menu-email">
+                                    {{ app.user.email }}
+                                </span>
+                            </div>
+                            <div class="sidebar__user-menu-body">
+                                {#
+                                <a href="#" class="sidebar__user-menu-item" role="menuitem">
+                                    <svg viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                    Mon profil
+                                </a>
+                                <a href="#" class="sidebar__user-menu-item" role="menuitem">
+                                    <svg viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    Paramètres
+                                </a>
+                                <div class="sidebar__user-menu-sep"></div>
+                                #}
+                                <a href="{{ path('app_logout') }}"
+                                class="sidebar__user-menu-item sidebar__user-menu-item--danger"
+                                role="menuitem">
+                                    <svg viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                    </svg>
+                                    Déconnexion
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </aside>
+
+            {# Overlay mobile #}
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            {# ═══ MAIN ═══ #}
+            <div class="main-content">
+
+                {# Topbar #}
+                <header class="topbar">
+                    <button class="topbar__toggle" id="sidebar-toggle" type="button" aria-label="Menu">
+                        <svg viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                    <span class="topbar__separator"></span>
+
+                    <nav class="topbar__breadcrumb" aria-label="Fil d'ariane">
+                        <a href="{{ path('home') }}" class="topbar__breadcrumb-link">PontBascule</a>
+                        <span class="topbar__breadcrumb-sep" aria-hidden="true">/</span>
+                        <span class="topbar__breadcrumb-current">{% block page_title '' %}</span>
+                    </nav>
+
+                    <div class="topbar__actions">
+
+                        {# Thème #}
+                        <button class="topbar__btn" id="theme-toggle" type="button" aria-label="Changer le thème">
+                            <svg id="icon-sun" viewBox="0 0 24 24" stroke-width="2" style="display:none">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M18.364 18.364l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+                            </svg>
+                            <svg id="icon-moon" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                            </svg>
+                        </button>
+
+                        {# Profil #}
+                        <div class="topbar__profile">
+                            <button class="topbar__avatar" id="profile-toggle" type="button" aria-label="Profil utilisateur" aria-haspopup="true" aria-expanded="false">
+                                AD
+                            </button>
+                            <div class="profile-dropdown" id="profile-dropdown" role="menu">
+                                <div class="profile-dropdown__header">
+                                    <span class="profile-dropdown__name">
+                                        {{ app.user.nom }} {{ app.user.prenom }}
+                                    </span>
+                                    <span class="profile-dropdown__email">{{ app.user.email }}</span>
+                                </div>
+                                <div class="profile-dropdown__body">
+                                    {#
+                                    <a href="#" class="profile-dropdown__item" role="menuitem">
+                                        <svg viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                        </svg>
+                                        Mon profil
+                                    </a>
+                                    <a href="#" class="profile-dropdown__item" role="menuitem">
+                                        <svg viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                        Paramètres
+                                    </a>
+                                    <div class="profile-dropdown__separator"></div>
+                                    #}
+                                    <a href="{{ path('app_logout') }}" class="profile-dropdown__item profile-dropdown__item--danger" role="menuitem">
+                                        <svg viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                        </svg>
+                                        Déconnexion
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </header>
+
+                <main class="page">
+                    {% include 'partials/flash.html.twig' %}
+                    {% block body %}{% endblock %}
+                </main>
+
+            </div>
+        </div>
+
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    </body>
+</html>
